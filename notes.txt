@@ -1,0 +1,47 @@
+My Fictional Sport commentator:
+  1. Get the current score from API
+    Options:
+      - CricBuzz Developer API / Cricinfo Webscrapping
+      - ESPN Cricinfo / Webscrapping
+      - RapidAPI Basic Plan for now should do since rn its just prototype.
+    Expectations from API:
+      list All Live Matches
+        This should contain information like
+          - Ongoing live Matches
+          - Should have matchID
+          - Anything Else, revisit later?
+      Get Details for a particular match (Mayb not need with RapidAPI, try to extract all info from live api itself!)
+      (we will call api twice for this lets just keep it to one api call for now with minimal information)
+        Focus on live score, basically we are looking into following informations
+          Team Batting:
+          Team Bowling:
+          Current Score:
+          Target Score: ?! / yet to bat
+          Current Batsmen:
+          Bowler:
+          RR: 
+          R-RR: !?
+        for prototype this should be enough i believe
+  2. Once we have the data Two threads open up for us
+    2.1 Data Presentation
+        Make a UI to show this data.it would be something like live matches, once a user clicks on live match
+        a new page or some dialogue box should open where user can get some options (5 for now?!)
+        these options are fictional characters that would summarize the data for us
+        Fictional Characters
+          1. Micheal Scott (The Office)
+          2. Rick (Rick and Morty)
+          3. Phil Dunphy (Modern Family)
+          4. Jetha Lal (Tarak Mehta ka Utla Chashma)
+          5. Jake Paralta (Broklynn 99)
+        These Characters will be kind of a button where user can click can get commentator text(audio later? video never/later?)
+        generated with steps defined in 2.2
+        How to present
+        - HTML/CSS/Javascript -> too much effort
+        - REACT -> don't know how to do :'(
+        - streamlit -> try it out!
+    2.2 Data Generation
+        Once user clicks on a avatar on 2.1 we should have prompt a GenAI model 
+        providing it data and asking it to generate reponse as one of the avatar
+        tried with gpt3.5 responses were decent enough
+  3. Shit can go wrong?
+    Need to add disclaimer to not trust output and this is a fun project intended for education purpose!
