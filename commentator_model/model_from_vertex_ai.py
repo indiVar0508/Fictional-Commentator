@@ -13,8 +13,8 @@ from fictional_commentator.rapid_api_fetcher import RapidAPIFetcher
 
 # Cache for 30s to avoid overspamming
 @cached(cache=TTLCache(maxsize=5, ttl=30))
-def get_match_score(match_id):
-    return RapidAPIFetcher.get_match_details(match_id)
+def get_match_score(url, api_key, api_host, match_id):
+    return RapidAPIFetcher.get_match_details(url, api_key, api_host, match_id)
     # Dummy data
     # return {
     #     "batsman_name": "Dhruv Jurel",
@@ -60,12 +60,15 @@ get_match_score_func = FunctionDeclaration(
 match_score_tool = Tool(function_declarations=[get_match_score_func])
 
 
-def get_score_summary(match_id, commentator, show_name):
+def get_score_summary(match_id, commentator, show_name, url, api_key, api_host):
     prompt = f"""What is the score of match ID '{match_id}'"""
 
     response = model.generate_content(prompt, tools=[match_score_tool])
     score_response = get_match_score(
-        **response.candidates[0].content.parts[0].function_call.args
+        url,
+        api_key,
+        api_host,
+        **response.candidates[0].content.parts[0].function_call.args,
     )
     # Dummy data
     # return "some long string asfdmowidgfo reanglinas erinvlareifnpao sdmkave; feijngjvs dmvkpiaeroamf efovmosfp, jier9mjo9mjc fgrcneoricuromcf li a,x,eroim  cewr u oifnmeoifcnh 90o,uwgfkneslfciwerc src,oei"

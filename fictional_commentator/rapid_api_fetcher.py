@@ -11,18 +11,14 @@ from .data_fetcher.base_fetcher import BaseFetcher
 
 
 class RapidAPIFetcher(BaseFetcher):
-    URL = os.environ.get("SPORT_URL", "")
-    API_KEY = os.environ.get("SPORT_API_KEY", None)
-    API_HOST = os.environ.get("SPORT_API_HOST", None)
-
     @classmethod
-    def get_all_live_matches(cls) -> dict:
+    def get_all_live_matches(cls, url, api_key, api_host) -> dict:
         # Need to fetch all Live ongoing match
         all_live_matches: dict = cls.get_json_data(
-            url=f"{cls.URL}/matches/v1/live",
+            url=f"{url}/matches/v1/live",
             headers={
-                "X-RapidAPI-Key": cls.API_KEY,
-                "X-RapidAPI-Host": cls.API_HOST,
+                "X-RapidAPI-Key": api_key,
+                "X-RapidAPI-Host": api_host,
             },
         )
         # Filter out relevant information
@@ -83,12 +79,12 @@ class RapidAPIFetcher(BaseFetcher):
         return matches
 
     @classmethod
-    def get_match_details(cls, match_id) -> dict:
+    def get_match_details(cls, url, api_key, api_host, match_id) -> dict:
         response: dict = cls.get_json_data(
-            url=f"{cls.URL}/mcenter/v1/{match_id}/leanback",
+            url=f"{url}/mcenter/v1/{match_id}/leanback",
             headers={
-                "X-RapidAPI-Key": cls.API_KEY,
-                "X-RapidAPI-Host": cls.API_HOST,
+                "X-RapidAPI-Key": api_key,
+                "X-RapidAPI-Host": api_host,
             },
         )
         match_details = {}

@@ -3,7 +3,6 @@ import time
 
 from fictional_commentator.rapid_api_fetcher import RapidAPIFetcher
 from streamlit_image_select import image_select
-from commentator_model.model_from_vertex_ai import get_score_summary
 
 st.set_page_config(
     page_title="Fictional Commentator",
@@ -15,7 +14,7 @@ st.set_page_config(
 
 @st.cache_data(ttl=60)
 def get_live_matches():
-    return RapidAPIFetcher.get_all_live_matches()
+    return RapidAPIFetcher.get_all_live_matches(**st.secrets["FETCH_SCORE"])
     # Dummy Data
     # return {
     #     "matches": {
@@ -71,6 +70,27 @@ def get_live_matches():
 if "live_on_going_matches" not in st.session_state:
     st.session_state["live_on_going_matches"] = get_live_matches()
 
+if "initialize_model" not in st.session_state:
+    import vertexai
+    from google.oauth2 import service_account
+
+    credentials = service_account.Credentials.from_service_account_info(
+        st.secrets["VERTEX_AI"]
+    )
+
+    scoped_credentials = credentials.with_scopes(
+        ["https://www.googleapis.com/auth/cloud-platform"]
+    )
+
+    vertexai.init(
+        project=st.secrets["VERTEX_AI"]["project_id"],
+        location=st.secrets["VERTEX_AI"]["location"],
+        credentials=scoped_credentials,
+    )
+    st.session_state["initialize_model"] = True
+
+
+from commentator_model.model_from_vertex_ai import get_score_summary  # noqa: E402
 
 ### Show Live Matches on the side bar as a drop down
 # Fetch all Match details
@@ -251,10 +271,12 @@ with st.chat_message("assistant", avatar=COMMENTATOR):
     else:
         # get API response
         summary = get_score_summary(
-            match_name_to_id_mapping[live_match], **commentator_details[COMMENTATOR]
+            match_name_to_id_mapping[live_match],
+            **commentator_details[COMMENTATOR],
+            **st.secrets["FETCH_SCORE"],
         )
         response = st.write_stream(send_response_in_delay(summary))
-# Add assistant response to chat history
+
 st.session_state.messages.append(
     {"role": "assistant", "content": response, "avatar": COMMENTATOR}
 )
