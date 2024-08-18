@@ -1,0 +1,19 @@
+name: Fictional Commentator news
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  FictionalCommentatorNews:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: python x_bot.py
+        env:
+          NEWS_SECRET: ${{ secrets.NEWS_SECRET }}
