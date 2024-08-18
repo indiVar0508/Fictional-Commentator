@@ -35,6 +35,11 @@ def get_match_score(url, api_key, api_host, match_id):
     # }
 
 
+@cached(cache=TTLCache(maxsize=5, ttl=30))
+def get_cricket_news(url: str, api_key: str, api_host: str) -> str:
+    return RapidAPIFetcher.get_some_random_news(url, api_key, api_host)
+
+
 # https://github.com/googleapis/python-aiplatform/blob/main/vertexai/generative_models/_generative_models.py#L1224
 model = GenerativeModel(
     # Bit aggressive model!
@@ -42,6 +47,7 @@ model = GenerativeModel(
     generation_config=GenerationConfig(temperature=0.8),
 )
 
+# Define tools
 get_match_score_func = FunctionDeclaration(
     name="get_match_score",
     description="get scoreboard detail for a given match ID",
@@ -56,6 +62,14 @@ get_match_score_func = FunctionDeclaration(
         "required": ["match_id"],
     },
 )
+
+# get_cricket_news_func = FunctionDeclaration(
+#     name="get_cricket_news",
+#     description="gets story or news of some latest related cricket or its players",
+#     # TODO: make this more dynamica and specific like category, region etc.
+#     parameters={},
+# )
+
 
 match_score_tool = Tool(function_declarations=[get_match_score_func])
 
@@ -114,4 +128,20 @@ def get_score_summary(match_id, commentator, show_name, url, api_key, api_host):
     return response.candidates[0].content.parts[0].text
 
 
-# print(get_score_summary(90162, "Micheal Scott", "The Office"))
+def get_some_cricket_news(commentator, show_name, url, api_key, api_host):
+    news = get_cricket_news(url, api_key, api_host)
+
+    prompt = f"""
+    You are a social media manager managing a twitter account,
+    You need to create a post summarizing summarising below mentioned article detail in less than 270 characters
+    be precised and professional while pretending to be {commentator} from the show {show_name}.
+
+    Your story is 
+    `{news}`
+    
+    Try to add quirks and references from {show_name} while being polite and friendly summary, 
+    NOTE: *you have a character limit of 270 characters*
+    """
+
+    response = model.generate_content(prompt)
+    return response.candidates[0].content.parts[0].text
