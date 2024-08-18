@@ -6,7 +6,7 @@ We need two types of data for first prototype
   2. Details of specific match
 """
 
-import os
+import random
 from .data_fetcher.base_fetcher import BaseFetcher
 
 
@@ -140,3 +140,34 @@ class RapidAPIFetcher(BaseFetcher):
                 "name", "Failed to get name"
             )
         return match_details
+
+    @classmethod
+    def get_some_random_news(cls, url, api_key, api_host) -> str:
+        """
+        Route responsible to fetch current stats and analysis
+        """
+        response: dict = cls.get_json_data(
+            url=f"{url}/news/v1/index",
+            headers={
+                "X-RapidAPI-Key": api_key,
+                "X-RapidAPI-Host": api_host,
+            },
+        )
+        # Remove ads & select a random story
+        story = random.choice(
+            list(filter(lambda x: "ad" not in x, response["storyList"]))
+        )["story"]
+        # get details of story!
+        response: dict = cls.get_json_data(
+            url=f"{url}/news/v1/detail/{story['id']}",
+            headers={
+                "X-RapidAPI-Key": api_key,
+                "X-RapidAPI-Host": api_host,
+            },
+        )
+        # remove ads
+        content = list(filter(lambda x: "ad" not in x, response["content"]))
+        # build up story
+        news = "".join([c.get("content", {}).get("contentValue", "") for c in content])
+        assert len(news) > 0, "Failed to parse news"
+        return news
