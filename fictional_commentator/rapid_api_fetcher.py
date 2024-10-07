@@ -108,11 +108,10 @@ class RapidAPIFetcher(BaseFetcher):
             "batsmanNonStriker"
         ].get("batBalls", 0)
 
-        match_details["score"] = response["miniscore"]["batTeam"].get("teamScore", 0)
-        match_details["wickets"] = response["miniscore"]["batTeam"].get("teamWkts", 0)
-        match_details["overs"] = response["miniscore"].get("overs", 0)
+        match_details["score"] = response["miniscore"]["batTeamScore"].get("teamScore", 0)
+        match_details["wickets"] = response["miniscore"]["batTeamScore"].get("teamWkts", 0)
         match_details["current_runrate"] = response["miniscore"].get(
-            "currentRunRate", 0
+            "crr", 0
         )
 
         match_details["bowler_name"] = response["miniscore"]["bowlerStriker"].get(
@@ -124,19 +123,19 @@ class RapidAPIFetcher(BaseFetcher):
         match_details["bowler_wickets"] = response["miniscore"]["bowlerStriker"].get(
             "bowlWkts", -1
         )
-        batting_team_id = response["miniscore"]["batTeam"].get("teamId", -1)
-        if batting_team_id == response["matchHeader"]["team1"].get("id"):
-            match_details["batting_team_name"] = response["matchHeader"]["team1"].get(
+        batting_team_id = response["miniscore"]["batTeamScore"].get("teamId", -1)
+        if batting_team_id == response["matchHeaders"]["team1"].get("id"):
+            match_details["batting_team_name"] = response["matchHeaders"]["team1"].get(
                 "name", "Failed to get name"
             )
-            match_details["bowling_team_name"] = response["matchHeader"]["team2"].get(
+            match_details["bowling_team_name"] = response["matchHeaders"]["team2"].get(
                 "name", "Failed to get name"
             )
         else:
-            match_details["batting_team_name"] = response["matchHeader"]["team2"].get(
+            match_details["batting_team_name"] = response["matchHeaders"]["team2"].get(
                 "name", "Failed to get name"
             )
-            match_details["bowling_team_name"] = response["matchHeader"]["team1"].get(
+            match_details["bowling_team_name"] = response["matchHeaders"]["team1"].get(
                 "name", "Failed to get name"
             )
         return match_details
